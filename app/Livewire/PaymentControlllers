@@ -1,0 +1,33 @@
+<?php
+namespace App\Http\Controllers;
+
+use App\Models\Application;
+
+class PaymentController extends Controller
+{
+    public function show(Application $application)
+    {
+        return view('payment.mock', compact('application'));
+    }
+
+    public function success(Application $application)
+    {
+        $application->update([
+            'payment_status' => 'paid',
+            'payment_method' => 'mock',
+            'payment_id' => 'FAKE-' . uniqid()
+        ]);
+
+        return redirect()->route('applications')->with('success', 'Оплата успешно имитирована!');
+    }
+
+    public function fail(Application $application)
+    {
+        $application->update([
+            'payment_status' => 'failed',
+            'payment_method' => 'mock'
+        ]);
+
+        return redirect()->route('applications')->with('error', 'Оплата отклонена (имитация)');
+    }
+}
