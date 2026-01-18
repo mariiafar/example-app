@@ -56,4 +56,11 @@ class Service extends Model
     {
         return ServiceFactory::new();
     }
+
+    // Связь с мастерами
+    public function masters()
+    {
+        return $this->belongsToMany(User::class, 'master_service', 'service_id', 'master_id')
+            ->withTimestamps();
+    }
 }

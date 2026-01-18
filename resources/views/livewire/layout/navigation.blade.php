@@ -52,6 +52,13 @@ new class extends Component
                             {{ __('Отчетность') }}
                         </x-nav-link>
                     </div>
+                    @if($role === 'admin')
+                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <x-nav-link :href="route('masters')" :active="request()->routeIs('masters')" wire:navigate>
+                                {{ __('Мастера') }}
+                            </x-nav-link>
+                        </div>
+                    @endif
                 @endif
 
                 @if(in_array($role, ['admin', 'master', 'client']))
@@ -60,11 +67,13 @@ new class extends Component
                             {{ __('Услуги') }}
                         </x-nav-link>
                     </div>
-                    <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                        <x-nav-link :href="route('schedule-browser')" :active="request()->routeIs('schedule-browser')" wire:navigate>
-                            {{ __('Запись') }}
-                        </x-nav-link>
-                    </div>
+                    @if(in_array($role, ['admin', 'client']))
+                        <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                            <x-nav-link :href="route('schedule-browser')" :active="request()->routeIs('schedule-browser')" wire:navigate>
+                                {{ __('Запись') }}
+                            </x-nav-link>
+                        </div>
+                    @endif
                     <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                         <x-nav-link :href="route('reviews')" :active="request()->routeIs('reviews')" wire:navigate>
                             {{ __('Отзывы') }}

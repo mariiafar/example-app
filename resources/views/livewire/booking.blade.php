@@ -58,7 +58,8 @@
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Мастер *</label>
             <select wire:model="master_id" 
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    @if($route_master_id) disabled @endif>
                 <option value="">Выберите мастера</option>
                 @foreach($masters as $master)
                     <option value="{{ $master->id }}" 
@@ -67,34 +68,52 @@
                     </option>
                 @endforeach
             </select>
+            @if($route_master_id)
+                <input type="hidden" wire:model="master_id" value="{{ $route_master_id }}">
+            @endif
             @error('master_id') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Дата *</label>
-                <input type="date" wire:model="selectedDate" required
-                       min="{{ now()->format('Y-m-d') }}"
-                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @if($route_date)
+                    {{-- Если дата передана через маршрут, показываем как нередактируемое поле --}}
+                    <div class="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-700 font-medium">
+                        {{ \Carbon\Carbon::parse($route_date)->locale('ru')->isoFormat('D MMMM YYYY') }}
+                    </div>
+                    <input type="hidden" wire:model="selectedDate" value="{{ $route_date }}">
+                @else
+                    {{-- Если дата не передана, показываем обычное поле выбора --}}
+                    <input type="date" wire:model="selectedDate" required
+                           min="{{ now()->format('Y-m-d') }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                @endif
                 @error('selectedDate') <span class="text-red-500 text-sm">{{ $message }}</span> @enderror
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-2">Время *</label>
-                @if($selectedDate && $master_id)
-                    @if($selectedTime)
+                @if($route_date && $master_id)
+                    @if($route_time || $selectedTime)
+                        {{-- Если время передано через маршрут или выбрано, показываем его как нередактируемое --}}
+                        @php
+                            // Приоритет: route_time (переданное через маршрут) > selectedTime
+                            $displayTime = $route_time ?: $selectedTime;
+                        @endphp
                         <div class="p-4 bg-blue-50 border-2 border-blue-500 rounded-lg text-center">
                             <p class="text-lg font-semibold text-blue-700">
-                                {{ $selectedTime }} 
-                                @if($bookingEndTime && $bookingEndTime != $selectedTime)
+                                {{ $displayTime }}
+                                @if($bookingEndTime && $bookingEndTime != $displayTime)
                                     - {{ $bookingEndTime }}
                                 @endif
                             </p>
-                            <button type="button" wire:click="$set('selectedTime', '')"
-                                    class="mt-2 text-sm text-blue-600 hover:text-blue-800 underline">
-                                Изменить время
-                            </button>
                         </div>
+                        @if($route_time)
+                            {{-- Если время передано через маршрут, устанавливаем его через скрытое поле --}}
+                            <input type="hidden" wire:model="selectedTime" value="{{ $route_time }}">
+                        @endif
                     @else
+                        {{-- Если время не передано через маршрут и не выбрано, показываем выбор времени --}}
                         <div class="grid grid-cols-3 gap-2 max-h-40 overflow-y-auto p-2 border rounded-lg">
                             @foreach($this->timeSlots as $slot)
                                 <button type="button" wire:click="selectTimeSlot('{{ $slot['time'] }}')"
@@ -218,7 +237,7 @@
 
                     <button type="submit"
                             class="text-center" style="background-color: #3b82f6; color: white; border-radius: 8px;padding: 4px 12px;" >
-                        Оплатить {{ $depositAmount }}
+                        Оплатить {{ $depositAmount }} ₽
                     </button>
 
                     <button type="button" wire:click="closePaymentModal"

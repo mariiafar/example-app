@@ -26,8 +26,8 @@
                 <option value="all">Все роли</option>
                 @if(auth()->user()->role === 'admin')
                     <option value="admin">Администраторы</option>
+                    <option value="master">Мастера</option>
                 @endif
-                <option value="master">Мастера</option>
                 <option value="client">Клиенты</option>
             </select>
 

@@ -2,7 +2,7 @@
 
 
 use Illuminate\Support\Facades\Route;
-use App\Livewire\{Users, Services, Applications, Schedules, ScheduleBrowser, Reviews, WriteReviews, Booking, Report, ClientApplications, UserDeposits};
+use App\Livewire\{Users, Services, Applications, Schedules, ScheduleBrowser, Reviews, WriteReviews, Booking, Report, ClientApplications, UserDeposits, Masters};
 
 
 Route::view('/', 'welcome');
@@ -15,6 +15,7 @@ Route::middleware(['auth', 'role:admin,master'])->group(function () {
     Route::get('applications', Applications::class)->name('applications');
     Route::get('schedules', Schedules::class)->name('schedules');
     Route::get('report', Report::class)->name('report');
+    Route::get('masters', Masters::class)->name('masters');
 });
 
 

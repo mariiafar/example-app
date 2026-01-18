@@ -24,12 +24,23 @@ class Users extends Component
         $query = User::query();
 
         if (auth()->user()->role === 'master') {
-            $query->whereIn('role', ['master', 'client']);
+            // Мастер видит только клиентов
+            $query->where('role', 'client');
         }
 
         
         if ($this->filterRole !== 'all') {
-            $query->where('role', $this->filterRole);
+            // Для мастера фильтр по роли должен работать только для клиентов
+            if (auth()->user()->role === 'master') {
+                if ($this->filterRole !== 'client') {
+                    // Мастер не может фильтровать по другим ролям
+                    $query->whereRaw('1 = 0'); // Пустой результат
+                } else {
+                    $query->where('role', $this->filterRole);
+                }
+            } else {
+                $query->where('role', $this->filterRole);
+            }
         }
 
     $users = $query
