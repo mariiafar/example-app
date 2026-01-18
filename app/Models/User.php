@@ -42,4 +42,11 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    // Связь с услугами для мастеров
+    public function services()
+    {
+        return $this->belongsToMany(Service::class, 'master_service', 'master_id', 'service_id')
+            ->withTimestamps();
+    }
 }
